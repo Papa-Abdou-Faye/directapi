@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/rn/**)",
+      "Read(//c/rn/GimPaySDK/**)",
+      "Bash(nohup php -S 0.0.0.0:8090 -t backend backend/index.php)",
+      "Bash(disown)",
+      "Bash(curl -s -X POST http://127.0.0.1:8090/capture -H \"Content-Type: application/json\" -d '{\"SystemReference\":\"163016\"}')",
+      "Bash(netstat -ano)",
+      "Bash(tasklist //FI \"IMAGENAME eq php.exe\")",
+      "Bash(taskkill //F //PID 11716 //PID 9332 //PID 3324)",
+      "Bash(adb -s emulator-5556 uninstall com.gimpaytesterapp)",
+      "Bash(adb -s emulator-5556 install -r \"/c/rn/GimPaySDK/GimPayTesterApp/android/app/build/outputs/apk/release/app-release.apk\")",
+      "Bash(adb -s emulator-5556 shell am start -n com.gimpaytesterapp/.MainActivity)",
+      "Bash(adb -s emulator-5556 shell screencap -p //sdcard/s.png)",
+      "Bash(adb -s emulator-5556 pull //sdcard/s.png \"/c/rn/GimPaySDK/s.png\")",
+      "Bash(adb -s emulator-5556 shell uiautomator dump //sdcard/ui.xml)",
+      "Bash(adb -s emulator-5556 pull //sdcard/ui.xml \"/c/rn/GimPaySDK/ui.xml\")",
+      "Bash(adb -s emulator-5556 shell input tap 547 2213)",
+      "Bash(adb -s emulator-5556 shell screencap -p //sdcard/s2.png)",
+      "Bash(adb -s emulator-5556 pull //sdcard/s2.png \"/c/rn/GimPaySDK/s2.png\")",
+      "Bash(adb -s emulator-5556 shell input tap 540 540)",
+      "Bash(adb -s emulator-5556 shell screencap -p //sdcard/s3.png)",
+      "Bash(adb -s emulator-5556 pull //sdcard/s3.png \"/c/rn/GimPaySDK/s3.png\")",
+      "Bash(adb -s emulator-5556 shell input tap 540 1423)",
+      "Bash(adb -s emulator-5556 shell screencap -p //sdcard/s4.png)",
+      "Bash(adb -s emulator-5556 pull //sdcard/s4.png \"/c/rn/GimPaySDK/s4.png\")",
+      "Bash(adb -s emulator-5556 shell screencap -p //sdcard/s5.png)",
+      "Bash(adb -s emulator-5556 pull //sdcard/s5.png \"/c/rn/GimPaySDK/s5.png\")"
+    ]
+  }
+}
