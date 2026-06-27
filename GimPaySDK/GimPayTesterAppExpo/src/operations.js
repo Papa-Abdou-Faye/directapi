@@ -1,0 +1,117 @@
+import { now } from './gimpay/now';
+
+export const CATEGORIES = {
+  payment: 'Paiement',
+  management: 'Gestion',
+};
+
+// Reprend les memes valeurs de test que les fichiers test_*.php du SDK PHP.
+export const OPERATIONS = [
+  {
+    key: 'initiate-order',
+    label: 'Initiate Order',
+    description: 'Creer un lien de paiement',
+    icon: 'link',
+    color: 'indigo',
+    category: 'payment',
+    op: 'initiateOrder',
+    fields: [
+      { name: 'AmountTrxn', label: 'Montant', default: '600', keyboardType: 'numeric', icon: 'cash-outline', format: 'amount' },
+      { name: 'MerchantReference', label: 'Reference marchand', default: () => 'CMD_' + now(), icon: 'pricetag-outline' },
+      { name: 'PayerName', label: 'Nom payeur', default: 'Client Test', icon: 'person-outline' },
+      { name: 'CallBackUrl', label: 'Callback URL', default: 'https://webhook.site/xxxxxxxx', icon: 'link-outline' },
+      { name: 'ExpiryDateTime', label: 'Expiration (YYYYMMDDHHmm)', default: '202612121032', keyboardType: 'numeric', icon: 'calendar-outline' },
+      { name: 'Message', label: 'Message', default: 'Paiement abonnement', icon: 'chatbubble-outline' },
+    ],
+  },
+  {
+    key: 'pay-by-card',
+    label: 'Pay By Card',
+    description: 'Paiement direct par carte',
+    icon: 'card',
+    color: 'blue',
+    category: 'payment',
+    op: 'payByCard',
+    fields: [
+      { name: 'PAN', label: 'Numero de carte (PAN)', default: '4240325739707993', keyboardType: 'numeric', icon: 'card-outline', format: 'pan' },
+      { name: 'DateExpiration', label: 'Expiration (YYMM)', default: '2803', keyboardType: 'numeric', icon: 'calendar-outline' },
+      { name: 'CVV', label: 'CVV', default: '659', keyboardType: 'numeric', secure: true, icon: 'lock-closed-outline' },
+      { name: 'AmountTrxn', label: 'Montant', default: '500', keyboardType: 'numeric', icon: 'cash-outline', format: 'amount' },
+      { name: 'MerchantReference', label: 'Reference marchand', default: () => 'PAY_' + now(), icon: 'pricetag-outline' },
+      { name: 'ReturnURL', label: 'Return URL', default: 'https://webhook.site/xxxxxxxx', icon: 'link-outline' },
+    ],
+  },
+  {
+    key: 'pay-by-card-no-cvv',
+    label: 'Pay By Card (MOTO, sans CVV)',
+    description: 'Paiement telephonique, sans CVV',
+    icon: 'call',
+    color: 'teal',
+    category: 'payment',
+    op: 'payByCardWithoutCvv',
+    fields: [
+      { name: 'PAN', label: 'Numero de carte (PAN)', default: '4240325739707993', keyboardType: 'numeric', icon: 'card-outline', format: 'pan' },
+      { name: 'DateExpiration', label: 'Expiration (YYMM)', default: '2803', keyboardType: 'numeric', icon: 'calendar-outline' },
+      { name: 'AmountTrxn', label: 'Montant', default: '500', keyboardType: 'numeric', icon: 'cash-outline', format: 'amount' },
+      { name: 'MerchantReference', label: 'Reference marchand', default: () => 'MOTO_' + now(), icon: 'pricetag-outline' },
+    ],
+  },
+  {
+    key: 'filter-transactions',
+    label: 'Filter Transactions',
+    description: 'Rechercher des transactions',
+    icon: 'search',
+    color: 'blue',
+    category: 'management',
+    op: 'filterTransactions',
+    fields: [
+      { name: 'DateFrom', label: 'Date debut (YYYYMMDD)', default: '20251201', keyboardType: 'numeric', icon: 'calendar-outline' },
+      { name: 'DateTo', label: 'Date fin (YYYYMMDD)', default: () => now().slice(0, 8), keyboardType: 'numeric', icon: 'calendar-outline' },
+      { name: 'DisplayLength', label: 'Nb resultats', default: '10', keyboardType: 'numeric', icon: 'list-outline' },
+      { name: 'DisplayStart', label: 'Index depart', default: '0', keyboardType: 'numeric', icon: 'play-skip-forward-outline' },
+      { name: 'MerchantReference', label: 'Reference (optionnel)', default: '', icon: 'pricetag-outline' },
+    ],
+  },
+  {
+    key: 'capture',
+    label: 'Capture',
+    description: 'Capturer une pre-autorisation',
+    icon: 'lock-open',
+    color: 'orange',
+    category: 'management',
+    op: 'capture',
+    fields: [
+      { name: 'SystemReference', label: 'System Reference', default: '163016', keyboardType: 'numeric', icon: 'finger-print-outline' },
+    ],
+  },
+  {
+    key: 'refund',
+    label: 'Refund',
+    description: 'Remboursement total ou partiel',
+    icon: 'arrow-undo',
+    color: 'pink',
+    category: 'management',
+    op: 'refund',
+    fields: [
+      { name: 'amount', label: 'Montant', default: '500', keyboardType: 'numeric', icon: 'cash-outline', format: 'amount' },
+      { name: 'amountTrxn', label: 'Montant transaction', default: '500', keyboardType: 'numeric', icon: 'cash-outline', format: 'amount' },
+      { name: 'TxnId', label: 'TxnId', default: '163000', keyboardType: 'numeric', icon: 'receipt-outline' },
+      { name: 'refundReason', label: 'Motif', default: 'Demande client', icon: 'chatbox-ellipses-outline' },
+    ],
+  },
+  {
+    key: 'void',
+    label: 'Void / Cancel',
+    description: 'Annuler une transaction',
+    icon: 'close-circle',
+    color: 'slate',
+    category: 'management',
+    op: 'void',
+    fields: [
+      { name: 'amount', label: 'Montant', default: '500', keyboardType: 'numeric', icon: 'cash-outline', format: 'amount' },
+      { name: 'amountTrxn', label: 'Montant transaction', default: '500', keyboardType: 'numeric', icon: 'cash-outline', format: 'amount' },
+      { name: 'TxnId', label: 'TxnId', default: '163000', keyboardType: 'numeric', icon: 'receipt-outline' },
+      { name: 'refundReason', label: 'Motif', default: 'Annulation', icon: 'chatbox-ellipses-outline' },
+    ],
+  },
+];
