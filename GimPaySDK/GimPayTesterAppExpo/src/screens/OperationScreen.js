@@ -5,13 +5,13 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import FieldInput from '../components/FieldInput';
 import { OPERATIONS } from '../operations';
 import { OPS } from '../gimpay/client';
 import { loadSettings } from '../store/settings';
@@ -41,7 +41,7 @@ export default function OperationScreen({ route, navigation }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
+  const [activeField, setActiveField] = useState(null);
 
   const sheetRef = useRef(null);
   const snapPoints = useMemo(() => ['45%', '90%'], []);
@@ -79,10 +79,16 @@ export default function OperationScreen({ route, navigation }) {
     [],
   );
 
-  const setField = (field, text) => {
-    const formatted = formatFieldValue(field, text);
-    setValues(prev => ({ ...prev, [field.name]: formatted }));
-  };
+  const setField = useCallback(
+    (name, text) => {
+      const field = operation.fields.find(f => f.name === name);
+      const formatted = formatFieldValue(field, text);
+      setValues(prev => ({ ...prev, [name]: formatted }));
+    },
+    [operation],
+  );
+
+  const deactivateField = useCallback(() => setActiveField(null), []);
 
   const onReset = () => {
     setValues(buildInitialValues(operation.fields));
@@ -114,7 +120,10 @@ export default function OperationScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled">
         <View style={[styles.intro, { backgroundColor: palette.bg }]}>
           <Ionicons name={operation.icon} size={20} color={palette.solid} />
           <Text style={[styles.introText, { color: palette.solid }]}>{operation.description}</Text>
@@ -122,32 +131,18 @@ export default function OperationScreen({ route, navigation }) {
 
         <View style={styles.card}>
           {operation.fields.map((f, i) => (
-            <View key={f.name} style={[styles.field, i === operation.fields.length - 1 && styles.fieldLast]}>
-              <Text style={styles.label}>{f.label}</Text>
-              <View
-                style={[
-                  styles.inputRow,
-                  focusedField === f.name && { borderColor: palette.solid, ...shadow.card },
-                ]}>
-                <Ionicons
-                  name={f.icon ?? 'create-outline'}
-                  size={18}
-                  color={focusedField === f.name ? palette.solid : colors.textFaint}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  value={String(values[f.name] ?? '')}
-                  onChangeText={text => setField(f, text)}
-                  onFocus={() => setFocusedField(f.name)}
-                  onBlur={() => setFocusedField(null)}
-                  autoCapitalize="none"
-                  keyboardType={f.keyboardType ?? 'default'}
-                  secureTextEntry={Boolean(f.secure)}
-                  placeholderTextColor={colors.textFaint}
-                />
-              </View>
-            </View>
+            <FieldInput
+              key={f.name}
+              name={f.name}
+              field={f}
+              value={String(values[f.name] ?? '')}
+              onChangeText={setField}
+              accentColor={palette.solid}
+              isLast={i === operation.fields.length - 1}
+              active={activeField === f.name}
+              onActivate={() => setActiveField(f.name)}
+              onDeactivate={deactivateField}
+            />
           ))}
         </View>
 
@@ -259,25 +254,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     marginBottom: spacing.lg,
     ...shadow.card,
-  },
-  field: { marginBottom: spacing.md },
-  fieldLast: { marginBottom: 0 },
-  label: { fontSize: 13, color: colors.textMuted, marginBottom: spacing.xs, fontWeight: '600' },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.bg,
-  },
-  inputIcon: { marginRight: spacing.sm },
-  input: {
-    flex: 1,
-    paddingVertical: spacing.sm + 4,
-    fontSize: 14,
-    color: colors.text,
   },
   hint: { fontSize: 12, color: colors.textFaint, marginBottom: spacing.md },
   actions: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.sm },

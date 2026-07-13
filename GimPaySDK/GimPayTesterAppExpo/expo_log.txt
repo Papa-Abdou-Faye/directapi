@@ -1,0 +1,11 @@
+Starting project at C:\Users\FAYEADMIN\Desktop\directapi\GimPaySDK\GimPayTesterAppExpo
+Starting Metro Bundler
+
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+› Opening exp://192.168.52.214:8081 on pro
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Android Bundled 9275ms index.ts (1644 modules)
+Android Bundled 61ms index.ts (1 module)
+Android Bundled 65ms index.ts (1 module)
+Android Bundled 45ms index.ts (1 module)

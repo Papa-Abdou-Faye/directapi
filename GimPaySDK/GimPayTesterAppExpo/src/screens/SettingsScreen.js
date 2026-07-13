@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import FieldInput from '../components/FieldInput';
 import {
   DEFAULT_SETTINGS,
   ENVIRONMENTS,
@@ -30,7 +30,7 @@ export default function SettingsScreen({ navigation }) {
   const [values, setValues] = useState(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = useState(false);
   const [revealKey, setRevealKey] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
+  const [activeField, setActiveField] = useState(null);
 
   useEffect(() => {
     loadSettings().then(s => {
@@ -39,7 +39,13 @@ export default function SettingsScreen({ navigation }) {
     });
   }, []);
 
-  const setField = (name, text) => setValues(prev => ({ ...prev, [name]: text }));
+  const setField = useCallback(
+    (name, text) => setValues(prev => ({ ...prev, [name]: text })),
+    [],
+  );
+
+  const toggleRevealKey = useCallback(() => setRevealKey(v => !v), []);
+  const deactivateField = useCallback(() => setActiveField(null), []);
 
   const applyEnv = env => setField('baseUrl', ENVIRONMENTS[env]);
 
@@ -69,7 +75,10 @@ export default function SettingsScreen({ navigation }) {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled">
       <View style={styles.warning}>
         <Ionicons name="shield-checkmark-outline" size={18} color="#7A5B00" />
         <Text style={styles.warningText}>
@@ -100,37 +109,19 @@ export default function SettingsScreen({ navigation }) {
 
       <View style={styles.card}>
         {FIELDS.map(f => (
-          <View key={f.name} style={styles.field}>
-            <Text style={styles.label}>{f.label}</Text>
-            <View style={[styles.inputRow, focusedField === f.name && styles.inputRowFocused]}>
-              <Ionicons
-                name={f.icon}
-                size={18}
-                color={focusedField === f.name ? colors.primary : colors.textFaint}
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                value={String(values[f.name] ?? '')}
-                onChangeText={text => setField(f.name, text)}
-                onFocus={() => setFocusedField(f.name)}
-                onBlur={() => setFocusedField(null)}
-                autoCapitalize={f.autoCapitalize ?? 'none'}
-                keyboardType={f.keyboardType ?? 'default'}
-                secureTextEntry={Boolean(f.secure) && !revealKey}
-                placeholderTextColor={colors.textFaint}
-              />
-              {f.secure && (
-                <Pressable onPress={() => setRevealKey(v => !v)} hitSlop={8}>
-                  <Ionicons
-                    name={revealKey ? 'eye-off-outline' : 'eye-outline'}
-                    size={18}
-                    color={colors.textMuted}
-                  />
-                </Pressable>
-              )}
-            </View>
-          </View>
+          <FieldInput
+            key={f.name}
+            name={f.name}
+            field={f}
+            value={String(values[f.name] ?? '')}
+            onChangeText={setField}
+            accentColor={colors.primary}
+            secureVisible={revealKey}
+            onToggleSecureVisible={toggleRevealKey}
+            active={activeField === f.name}
+            onActivate={() => setActiveField(f.name)}
+            onDeactivate={deactivateField}
+          />
         ))}
       </View>
 
@@ -182,25 +173,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.lg,
     ...shadow.card,
-  },
-  field: { marginBottom: spacing.md },
-  label: { fontSize: 13, color: colors.textMuted, marginBottom: spacing.xs, fontWeight: '600' },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.bg,
-  },
-  inputRowFocused: { borderColor: colors.primary, ...shadow.card },
-  inputIcon: { marginRight: spacing.sm },
-  input: {
-    flex: 1,
-    paddingVertical: spacing.sm + 4,
-    fontSize: 14,
-    color: colors.text,
   },
   saveButton: { marginTop: spacing.lg, borderRadius: radius.pill, overflow: 'hidden', ...shadow.raised },
   saveButtonGradient: {
