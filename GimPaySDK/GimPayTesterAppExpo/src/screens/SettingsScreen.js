@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { Ionicons } from '@expo/vector-icons';
 import FieldInput from '../components/FieldInput';
 import {
@@ -27,6 +30,7 @@ const FIELDS = [
 ];
 
 export default function SettingsScreen({ navigation }) {
+  const headerHeight = useHeaderHeight();
   const [values, setValues] = useState(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = useState(false);
   const [revealKey, setRevealKey] = useState(false);
@@ -75,72 +79,79 @@ export default function SettingsScreen({ navigation }) {
   }
 
   return (
-    <ScrollView
+    <KeyboardAvoidingView
       style={styles.container}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled">
-      <View style={styles.warning}>
-        <Ionicons name="shield-checkmark-outline" size={18} color="#7A5B00" />
-        <Text style={styles.warningText}>
-          Ces identifiants (dont la cle secrete) sont stockes uniquement sur cet appareil et
-          servent a signer les requetes directement depuis l'app. Ne les utilise pas avec des
-          identifiants de production sur un device partage.
-        </Text>
-      </View>
-
-      <View style={styles.envRow}>
-        <Pressable
-          style={[styles.envButton, values.baseUrl === ENVIRONMENTS.uat && styles.envButtonActive]}
-          onPress={() => applyEnv('uat')}>
-          <Text
-            style={[styles.envButtonText, values.baseUrl === ENVIRONMENTS.uat && styles.envButtonTextActive]}>
-            UAT
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
+    >
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled">
+        <View style={styles.warning}>
+          <Ionicons name="shield-checkmark-outline" size={18} color="#7A5B00" />
+          <Text style={styles.warningText}>
+            Ces identifiants (dont la cle secrete) sont stockes uniquement sur cet appareil et
+            servent a signer les requetes directement depuis l'app. Ne les utilise pas avec des
+            identifiants de production sur un device partage.
           </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.envButton, values.baseUrl === ENVIRONMENTS.prod && styles.envButtonActive]}
-          onPress={() => applyEnv('prod')}>
-          <Text
-            style={[styles.envButtonText, values.baseUrl === ENVIRONMENTS.prod && styles.envButtonTextActive]}>
-            Production
-          </Text>
-        </Pressable>
-      </View>
+        </View>
 
-      <View style={styles.card}>
-        {FIELDS.map(f => (
-          <FieldInput
-            key={f.name}
-            name={f.name}
-            field={f}
-            value={String(values[f.name] ?? '')}
-            onChangeText={setField}
-            accentColor={colors.primary}
-            secureVisible={revealKey}
-            onToggleSecureVisible={toggleRevealKey}
-            active={activeField === f.name}
-            onActivate={() => setActiveField(f.name)}
-            onDeactivate={deactivateField}
-          />
-        ))}
-      </View>
+        <View style={styles.envRow}>
+          <Pressable
+            style={[styles.envButton, values.baseUrl === ENVIRONMENTS.uat && styles.envButtonActive]}
+            onPress={() => applyEnv('uat')}>
+            <Text
+              style={[styles.envButtonText, values.baseUrl === ENVIRONMENTS.uat && styles.envButtonTextActive]}>
+              UAT
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.envButton, values.baseUrl === ENVIRONMENTS.prod && styles.envButtonActive]}
+            onPress={() => applyEnv('prod')}>
+            <Text
+              style={[styles.envButtonText, values.baseUrl === ENVIRONMENTS.prod && styles.envButtonTextActive]}>
+              Production
+            </Text>
+          </Pressable>
+        </View>
 
-      <Pressable style={styles.saveButton} onPress={onSave}>
-        <LinearGradient
-          colors={[colors.gradientStart, colors.gradientEnd]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.saveButtonGradient}>
-          <Ionicons name="checkmark-circle" size={18} color="#fff" />
-          <Text style={styles.saveButtonText}>Enregistrer</Text>
-        </LinearGradient>
-      </Pressable>
-    </ScrollView>
+        <View style={styles.card}>
+          {FIELDS.map(f => (
+            <FieldInput
+              key={f.name}
+              name={f.name}
+              field={f}
+              value={String(values[f.name] ?? '')}
+              onChangeText={setField}
+              accentColor={colors.primary}
+              secureVisible={revealKey}
+              onToggleSecureVisible={toggleRevealKey}
+              active={activeField === f.name}
+              onActivate={() => setActiveField(f.name)}
+              onDeactivate={deactivateField}
+            />
+          ))}
+        </View>
+
+        <Pressable style={styles.saveButton} onPress={onSave}>
+          <LinearGradient
+            colors={[colors.gradientStart, colors.gradientEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.saveButtonGradient}>
+            <Ionicons name="checkmark-circle" size={18} color="#fff" />
+            <Text style={styles.saveButtonText}>Enregistrer</Text>
+          </LinearGradient>
+        </Pressable>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
+  scroll: { flex: 1 },
   content: { padding: spacing.lg, paddingBottom: spacing.xxl },
   warning: {
     flexDirection: 'row',

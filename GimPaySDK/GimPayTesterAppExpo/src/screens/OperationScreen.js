@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
@@ -28,6 +31,7 @@ function buildInitialValues(fields) {
 }
 
 export default function OperationScreen({ route, navigation }) {
+  const headerHeight = useHeaderHeight();
   const { operationKey } = route.params;
   const operation = useMemo(
     () => OPERATIONS.find(o => o.key === operationKey),
@@ -120,57 +124,63 @@ export default function OperationScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView
+      <KeyboardAvoidingView
         style={styles.scroll}
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled">
-        <View style={[styles.intro, { backgroundColor: palette.bg }]}>
-          <Ionicons name={operation.icon} size={20} color={palette.solid} />
-          <Text style={[styles.introText, { color: palette.solid }]}>{operation.description}</Text>
-        </View>
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
+      >
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled">
+          <View style={[styles.intro, { backgroundColor: palette.bg }]}>
+            <Ionicons name={operation.icon} size={20} color={palette.solid} />
+            <Text style={[styles.introText, { color: palette.solid }]}>{operation.description}</Text>
+          </View>
 
-        <View style={styles.card}>
-          {operation.fields.map((f, i) => (
-            <FieldInput
-              key={f.name}
-              name={f.name}
-              field={f}
-              value={String(values[f.name] ?? '')}
-              onChangeText={setField}
-              accentColor={palette.solid}
-              isLast={i === operation.fields.length - 1}
-              active={activeField === f.name}
-              onActivate={() => setActiveField(f.name)}
-              onDeactivate={deactivateField}
-            />
-          ))}
-        </View>
+          <View style={styles.card}>
+            {operation.fields.map((f, i) => (
+              <FieldInput
+                key={f.name}
+                name={f.name}
+                field={f}
+                value={String(values[f.name] ?? '')}
+                onChangeText={setField}
+                accentColor={palette.solid}
+                isLast={i === operation.fields.length - 1}
+                active={activeField === f.name}
+                onActivate={() => setActiveField(f.name)}
+                onDeactivate={deactivateField}
+              />
+            ))}
+          </View>
 
-        {!settings && <Text style={styles.hint}>Chargement des reglages...</Text>}
+          {!settings && <Text style={styles.hint}>Chargement des reglages...</Text>}
 
-        <View style={styles.actions}>
-          <Pressable
-            style={styles.sendButton}
-            onPress={send}
-            disabled={loading || !settings}>
-            <LinearGradient
-              colors={loading || !settings ? ['#C8CBDA', '#C8CBDA'] : palette.gradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.sendButtonGradient}>
-              {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Ionicons name="send" size={16} color="#fff" />
-              )}
-              <Text style={styles.sendButtonText}>{loading ? 'Envoi...' : 'Envoyer'}</Text>
-            </LinearGradient>
-          </Pressable>
-          <Pressable style={styles.resetButton} onPress={onReset} disabled={loading}>
-            <Ionicons name="refresh" size={16} color={colors.textMuted} />
-          </Pressable>
-        </View>
-      </ScrollView>
+          <View style={styles.actions}>
+            <Pressable
+              style={styles.sendButton}
+              onPress={send}
+              disabled={loading || !settings}>
+              <LinearGradient
+                colors={loading || !settings ? ['#C8CBDA', '#C8CBDA'] : palette.gradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.sendButtonGradient}>
+                {loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Ionicons name="send" size={16} color="#fff" />
+                )}
+                <Text style={styles.sendButtonText}>{loading ? 'Envoi...' : 'Envoyer'}</Text>
+              </LinearGradient>
+            </Pressable>
+            <Pressable style={styles.resetButton} onPress={onReset} disabled={loading}>
+              <Ionicons name="refresh" size={16} color={colors.textMuted} />
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <BottomSheet
         ref={sheetRef}

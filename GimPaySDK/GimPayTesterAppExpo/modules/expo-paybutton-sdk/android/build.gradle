@@ -1,0 +1,30 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'expo-module-gradle-plugin'
+
+group = 'expo.modules.paybuttonsdk'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.paybuttonsdk"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+// Fallback for Gradle configurations that still allow per-module repositories.
+// The primary fix for JitPack resolution is plugins/withPayButtonJitpack.js,
+// which registers the repo in settings.gradle (Gradle 8 centralized repos).
+repositories {
+  maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+  // TODO: confirm this is the correct/latest artifact coordinate on
+  // https://jitpack.io/#GIMPAY/paybutton once resolved in Android Studio.
+  implementation 'com.github.GIMPAY:paybutton:v1.0.0'
+}

@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/HomeScreen';
 import OperationScreen from './src/screens/OperationScreen';
+import PayButtonSdkScreen from './src/screens/PayButtonSdkScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import { colors } from './src/theme';
 
@@ -22,6 +23,11 @@ export default function App(): React.JSX.Element {
           }}>
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Operation" component={OperationScreen} />
+          <Stack.Screen
+            name="PayButtonSdk"
+            component={PayButtonSdkScreen}
+            options={{ title: 'SDK natif PayButton' }}
+          />
           <Stack.Screen
             name="Settings"
             component={SettingsScreen}

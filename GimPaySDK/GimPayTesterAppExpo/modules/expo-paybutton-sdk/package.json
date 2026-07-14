@@ -1,0 +1,7 @@
+{
+  "name": "expo-paybutton-sdk",
+  "version": "1.0.0",
+  "description": "Local Expo module wrapping the native GIM PayButton SDK (Android only).",
+  "main": "index.ts",
+  "platforms": ["android"]
+}

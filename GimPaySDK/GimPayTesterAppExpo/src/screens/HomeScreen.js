@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Animated, Pressable, SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Animated, Platform, Pressable, SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -137,6 +137,19 @@ export default function HomeScreen({ navigation }) {
         </Pressable>
       )}
 
+      {Platform.OS === 'android' && (
+        <Pressable style={styles.sdkCard} onPress={() => navigation.navigate('PayButtonSdk')}>
+          <View style={[styles.sdkIconBadge, { backgroundColor: operationPalette.green.bg }]}>
+            <Ionicons name="flash" size={20} color={operationPalette.green.solid} />
+          </View>
+          <View style={styles.sdkCardBody}>
+            <Text style={styles.sdkCardTitle}>SDK natif PayButton (Android)</Text>
+            <Text style={styles.sdkCardSubtitle}>Tester l'UI de paiement native du SDK GIM PayButton</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.textFaint} />
+        </Pressable>
+      )}
+
       <SectionList
         sections={sections}
         keyExtractor={item => item.key}
@@ -253,6 +266,27 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   bannerText: { color: '#7A5B00', fontSize: 13, flex: 1 },
+  sdkCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    gap: spacing.md,
+    ...shadow.card,
+  },
+  sdkIconBadge: {
+    width: 46,
+    height: 46,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sdkCardBody: { flex: 1 },
+  sdkCardTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
+  sdkCardSubtitle: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   list: { padding: spacing.lg, paddingBottom: spacing.xxl },
   sectionTitle: {
     fontSize: 13,
